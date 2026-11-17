@@ -1,0 +1,10 @@
+node_modules
+dist
+.env
+.env.local
+.DS_Store
+.taste-skill
+shots
+# dados com nomes de docentes: ficam só na máquina
+db/privado/
+dados-fonte/privado/

@@ -2,6 +2,8 @@
 
 # Oferta de Disciplinas EAM
 
+**Acesse:** [darlanmnunes.github.io/oferta-eam-ufv](https://darlanmnunes.github.io/oferta-eam-ufv/)
+
 Sistema para planejar, a cada semestre, a oferta de disciplinas do curso de Engenharia de Agrimensura e
 Cartográfica da UFV: turmas, horários, salas e carga docente. Substitui a planilha de distribuição de aulas.
 
@@ -40,6 +42,10 @@ flowchart LR
 
 React 19, TypeScript e Vite 8; banco e login no Supabase (PostgreSQL); publicação no GitHub Pages pelo ramo
 `gh-pages`.
+
+- O banco fica no esquema `oferta` do mesmo projeto Supabase do [Acervo do LEA](https://github.com/darlanmnunes/lea-eam-ufv),
+  sem misturar tabelas nem permissões. O login com Google é o mesmo dos dois sistemas. No Supabase, o esquema `oferta`
+  precisa estar em Data API > Settings > Exposed schemas.
 
 - Sem `.env`, o site roda em **modo demonstração**: horários reais da DTI e docentes fictícios, com os dados
   guardados só no navegador.

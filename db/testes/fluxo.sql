@@ -1,5 +1,6 @@
 -- Percorre as regras como cada tipo de pessoa. Qualquer falha interrompe o teste.
 \set QUIET on
+set search_path = oferta, public;
 create function pg_temp.como(p_uid text, p_email text) returns void language sql as $$
   select set_config('request.jwt.claim.sub', p_uid, false),
          set_config('request.jwt.claims', json_build_object('sub', p_uid, 'email', p_email)::text, false);

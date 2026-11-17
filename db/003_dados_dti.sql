@@ -1,6 +1,8 @@
 -- Catálogo e oferta histórica do curso (fonte: Registro Escolar/UFV, publicado no site da DTI, 2026-11-17).
 -- Gerado por scripts/importar-dti.mjs. Idempotente: não apaga turmas criadas no sistema.
 
+set search_path = oferta, public;
+
 insert into disciplinas (codigo, nome, cred_t, cred_p, nivel, periodicidade, periodo) values
   ('EAM 190', 'Introdução à Engenharia de Agrimensura e Cartográfica', 1, 0, 'grad', 'impar', 1),
   ('EAM 191', 'Introdução à Extensão Universitária', 2, 0, 'grad', 'eventual', 2),

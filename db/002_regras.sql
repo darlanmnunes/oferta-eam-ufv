@@ -2,6 +2,8 @@
 -- e gravam o histórico. Docentes leem e editam a oferta; o administrador também
 -- cuida de docentes e semestres. Ninguém altera a estrutura do banco pelo site.
 
+set search_path = oferta, public;
+
 -- ---------------------------------------------------------------------------
 -- Quem sou eu
 -- ---------------------------------------------------------------------------
@@ -10,24 +12,24 @@ create function meu_email() returns text language sql stable as $$
 $$;
 
 create function eu_docente() returns docentes
-language sql stable security definer set search_path = public as $$
+language sql stable security definer set search_path = oferta, public as $$
   select d.* from docentes d
    where d.situacao = 'ativo' and (d.usuario_id = auth.uid() or (d.usuario_id is null and lower(d.email) = meu_email()))
    order by (d.usuario_id = auth.uid()) desc nulls last
    limit 1
 $$;
 
-create function sou_docente() returns boolean language sql stable security definer set search_path = public as $$
+create function sou_docente() returns boolean language sql stable security definer set search_path = oferta, public as $$
   select (eu_docente()).id is not null
 $$;
 
-create function sou_admin() returns boolean language sql stable security definer set search_path = public as $$
+create function sou_admin() returns boolean language sql stable security definer set search_path = oferta, public as $$
   select coalesce((eu_docente()).admin, false)
 $$;
 
 -- Primeiro acesso: liga a conta Google ao cadastro feito pelo administrador.
 create function entrar() returns docentes
-language plpgsql security definer set search_path = public as $$
+language plpgsql security definer set search_path = oferta, public as $$
 declare v docentes;
 begin
   if auth.uid() is null then raise exception 'Entre para continuar'; end if;
@@ -39,26 +41,26 @@ begin
 end $$;
 
 create function _registrar(p_semestre text, p_acao text, p_resumo text, p_dados jsonb default null) returns void
-language sql security definer set search_path = public as $$
+language sql security definer set search_path = oferta, public as $$
   insert into historico (autor_id, autor_nome, semestre_id, acao, resumo, dados)
   values ((eu_docente()).id, coalesce((eu_docente()).apelido, 'sistema'), p_semestre, p_acao, p_resumo, p_dados)
 $$;
 
-create function _exigir_docente() returns docentes language plpgsql stable security definer set search_path = public as $$
+create function _exigir_docente() returns docentes language plpgsql stable security definer set search_path = oferta, public as $$
 declare v docentes := eu_docente();
 begin
   if v.id is null then raise exception 'Acesso restrito aos docentes do curso'; end if;
   return v;
 end $$;
 
-create function _exigir_admin() returns docentes language plpgsql stable security definer set search_path = public as $$
+create function _exigir_admin() returns docentes language plpgsql stable security definer set search_path = oferta, public as $$
 declare v docentes := _exigir_docente();
 begin
   if not v.admin then raise exception 'Só o administrador pode fazer isso'; end if;
   return v;
 end $$;
 
-create function _exigir_aberto(p_semestre text) returns void language plpgsql stable security definer set search_path = public as $$
+create function _exigir_aberto(p_semestre text) returns void language plpgsql stable security definer set search_path = oferta, public as $$
 declare v situacao_semestre;
 begin
   select situacao into v from semestres where id = p_semestre;
@@ -72,7 +74,7 @@ create function _rotulo(p_turma turmas) returns text language sql immutable as $
   select p_turma.disciplina_codigo || ' ' || p_turma.tipo || p_turma.numero
 $$;
 
-create function _turma_json(p_id uuid) returns jsonb language sql stable security definer set search_path = public as $$
+create function _turma_json(p_id uuid) returns jsonb language sql stable security definer set search_path = oferta, public as $$
   select jsonb_build_object(
     'disciplina', t.disciplina_codigo, 'tipo', t.tipo, 'numero', t.numero, 'vagas', t.vagas,
     'vagas_cursos', t.vagas_cursos, 'obs', t.obs,
@@ -87,7 +89,7 @@ $$;
 -- p: {id?, semestre_id, disciplina_codigo, tipo, numero, vagas, vagas_cursos, obs,
 --     docentes: [uuid | {id, horas}], horarios: [{dia, inicio, fim, sala}]}
 create function salvar_turma(p jsonb) returns uuid
-language plpgsql security definer set search_path = public as $$
+language plpgsql security definer set search_path = oferta, public as $$
 declare
   v_eu docentes := _exigir_docente();
   v_id uuid := nullif(p ->> 'id', '')::uuid;
@@ -142,7 +144,7 @@ exception when unique_violation then
 end $$;
 
 create function excluir_turma(p_id uuid) returns void
-language plpgsql security definer set search_path = public as $$
+language plpgsql security definer set search_path = oferta, public as $$
 declare v_t turmas; v_antes jsonb;
 begin
   perform _exigir_docente();
@@ -156,7 +158,7 @@ end $$;
 
 -- Copia as turmas de uma disciplina de outro semestre (com horários e docentes ativos).
 create function copiar_disciplina(p_semestre text, p_codigo text, p_origem text) returns int
-language plpgsql security definer set search_path = public as $$
+language plpgsql security definer set search_path = oferta, public as $$
 declare v_n int := 0; v_t turmas; v_nova uuid;
 begin
   perform _exigir_docente();
@@ -180,7 +182,7 @@ begin
 end $$;
 
 create function retirar_disciplina(p_semestre text, p_codigo text) returns int
-language plpgsql security definer set search_path = public as $$
+language plpgsql security definer set search_path = oferta, public as $$
 declare v_n int; v_antes jsonb;
 begin
   perform _exigir_docente();
@@ -199,7 +201,7 @@ end $$;
 -- Catálogo
 -- ---------------------------------------------------------------------------
 create function salvar_disciplina(p jsonb) returns text
-language plpgsql security definer set search_path = public as $$
+language plpgsql security definer set search_path = oferta, public as $$
 declare v_novo boolean;
 begin
   perform _exigir_docente();
@@ -217,7 +219,7 @@ begin
 end $$;
 
 create function excluir_disciplina(p_codigo text) returns void
-language plpgsql security definer set search_path = public as $$
+language plpgsql security definer set search_path = oferta, public as $$
 begin
   perform _exigir_docente();
   if exists (select 1 from turmas where disciplina_codigo = p_codigo) then
@@ -232,7 +234,7 @@ end $$;
 -- ---------------------------------------------------------------------------
 -- Cria o semestre copiando a oferta de outro (por padrão, o mesmo semestre do ano anterior).
 create function criar_semestre(p_ano int, p_semestre int, p_origem text default null) returns text
-language plpgsql security definer set search_path = public as $$
+language plpgsql security definer set search_path = oferta, public as $$
 declare
   v_id text := p_ano || '-' || p_semestre;
   v_origem text := coalesce(nullif(p_origem, ''), null);
@@ -258,7 +260,7 @@ begin
 end $$;
 
 create function definir_situacao(p_id text, p_situacao situacao_semestre) returns void
-language plpgsql security definer set search_path = public as $$
+language plpgsql security definer set search_path = oferta, public as $$
 begin
   perform _exigir_admin();
   update semestres set situacao = p_situacao where id = p_id;
@@ -268,7 +270,7 @@ begin
 end $$;
 
 create function excluir_semestre(p_id text, p_confirmacao text) returns void
-language plpgsql security definer set search_path = public as $$
+language plpgsql security definer set search_path = oferta, public as $$
 declare v_n int;
 begin
   perform _exigir_admin();
@@ -280,7 +282,7 @@ begin
 end $$;
 
 create function definir_publicacao(p_id text, p_publicado boolean) returns void
-language plpgsql security definer set search_path = public as $$
+language plpgsql security definer set search_path = oferta, public as $$
 begin
   perform _exigir_admin();
   update semestres set publicado = p_publicado where id = p_id;
@@ -291,7 +293,7 @@ end $$;
 
 -- Página pública: só semestres publicados; sem e-mails, carga ou histórico.
 create function oferta_publica() returns jsonb
-language sql stable security definer set search_path = public as $$
+language sql stable security definer set search_path = oferta, public as $$
   select jsonb_build_object(
     'semestres', coalesce((select jsonb_agg(jsonb_build_object('id', id, 'ano', ano, 'semestre', semestre, 'situacao', situacao) order by id)
                              from semestres where publicado), '[]'),
@@ -310,7 +312,7 @@ $$;
 -- Docentes (administrador)
 -- ---------------------------------------------------------------------------
 create function salvar_docente(p jsonb) returns uuid
-language plpgsql security definer set search_path = public as $$
+language plpgsql security definer set search_path = oferta, public as $$
 declare v_eu docentes := _exigir_admin(); v_id uuid := nullif(p ->> 'id', '')::uuid;
 begin
   if v_id = v_eu.id and (coalesce((p ->> 'admin')::boolean, false) = false or coalesce(p ->> 'situacao', 'ativo') <> 'ativo') then
@@ -353,16 +355,16 @@ create policy leitura on turma_docentes for select to authenticated using (sou_d
 create policy leitura on horarios for select to authenticated using (sou_docente());
 create policy leitura on historico for select to authenticated using (sou_docente());
 
-revoke all on all tables in schema public from anon, authenticated;
-revoke all on all sequences in schema public from anon, authenticated;
-revoke all on all functions in schema public from public, anon, authenticated;
-grant usage on schema public to authenticated;
+revoke all on all tables in schema oferta from anon, authenticated;
+revoke all on all sequences in schema oferta from anon, authenticated;
+revoke all on all functions in schema oferta from public, anon, authenticated;
+grant usage on schema oferta to authenticated;
 grant select on docentes, disciplinas, semestres, turmas, turma_docentes, horarios, historico to authenticated;
 -- o e-mail e a ligação com a conta ficam só para o administrador
 revoke select on docentes from authenticated;
 grant select (id, nome, apelido, ch_minima, situacao, admin) on docentes to authenticated;
 create function docentes_contato() returns table (id uuid, email text, ligado boolean)
-language sql stable security definer set search_path = public as $$
+language sql stable security definer set search_path = oferta, public as $$
   select id, email, usuario_id is not null from docentes where sou_admin()
 $$;
 
@@ -373,5 +375,8 @@ grant execute on function
   criar_semestre(int, int, text), definir_situacao(text, situacao_semestre), excluir_semestre(text, text),
   salvar_docente(jsonb), docentes_contato(), definir_publicacao(text, boolean), oferta_publica()
 to authenticated;
-grant usage on schema public to anon;
+grant usage on schema oferta to anon;
+grant usage on schema oferta to service_role;
+grant all on all tables in schema oferta to service_role;
+grant all on all sequences in schema oferta to service_role;
 grant execute on function oferta_publica() to anon;

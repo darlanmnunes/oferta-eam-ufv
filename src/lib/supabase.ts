@@ -3,7 +3,10 @@ import type { Api, Dados, Disciplina, Docente, Evento, Horario, Semestre, Turma 
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export function criarApiSupabase(url: string, chave: string): Api {
-  const sb = createClient(url, chave, { auth: { flowType: 'pkce', persistSession: true, detectSessionInUrl: true } })
+  const sb = createClient(url, chave, {
+    db: { schema: 'oferta' },
+    auth: { flowType: 'pkce', persistSession: true, detectSessionInUrl: true },
+  })
 
   const ok = <T,>(r: { data: T; error: { message: string } | null }) => {
     if (r.error) throw new Error(r.error.message)
@@ -29,6 +32,18 @@ export function criarApiSupabase(url: string, chave: string): Api {
       .sort((a: Horario, b: Horario) => (a.dia ?? 9) - (b.dia ?? 9) || (a.inicio ?? '').localeCompare(b.inicio ?? '')),
     atualizadoEm: x.atualizado_em ?? null, atualizadoPor: x.atualizado_por ?? null,
   })
+
+  // o Supabase devolve no máximo 1000 linhas por consulta: lê em páginas
+  const lerTurmas = async () => {
+    const todas: any[] = []
+    for (let de = 0; ; de += 1000) {
+      const r = await sb.from('turmas').select('*, turma_docentes(docente_id, horas), horarios(dia, inicio, fim, sala)')
+        .order('semestre_id').order('id').range(de, de + 999)
+      const lote = ok(r) as any[]
+      todas.push(...lote)
+      if (lote.length < 1000) return { data: todas, error: null }
+    }
+  }
 
   return {
     modo: 'supabase',
@@ -61,7 +76,7 @@ export function criarApiSupabase(url: string, chave: string): Api {
         sb.from('semestres').select('id, ano, semestre, situacao, origem, publicado').order('id'),
         sb.from('disciplinas').select('*').order('codigo'),
         sb.from('docentes').select('id, nome, apelido, ch_minima, situacao, admin').order('apelido'),
-        sb.from('turmas').select('*, turma_docentes(docente_id, horas), horarios(dia, inicio, fim, sala)').order('semestre_id').limit(5000),
+        lerTurmas(),
       ])
       const docentes = (ok(p) as any[]).map(docente)
       if (docentes.length) {

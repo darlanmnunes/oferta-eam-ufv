@@ -1,7 +1,10 @@
 -- Oferta de Disciplinas | Engenharia de Agrimensura e Cartográfica | UFV
 -- Esquema para PostgreSQL 14+ (Supabase). Aplicar na ordem: 001, 002, 003.
 
-create extension if not exists pgcrypto;
+-- Tudo fica no esquema "oferta": pode dividir o mesmo projeto Supabase com outro sistema (ex.: o do LEA)
+-- sem misturar tabelas nem permissões.
+create schema if not exists oferta;
+set search_path = oferta, public;
 
 create type nivel as enum ('grad', 'pos');
 create type periodicidade as enum (

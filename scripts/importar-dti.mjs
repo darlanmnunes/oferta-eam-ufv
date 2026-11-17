@@ -103,6 +103,8 @@ const q = (v) => (v == null ? 'null' : `'${String(v).replaceAll("'", "''")}'`)
 let sql = `-- Catálogo e oferta histórica do curso (fonte: Registro Escolar/UFV, publicado no site da DTI, ${new Date().toISOString().slice(0, 10)}).
 -- Gerado por scripts/importar-dti.mjs. Idempotente: não apaga turmas criadas no sistema.
 
+set search_path = oferta, public;
+
 insert into disciplinas (codigo, nome, cred_t, cred_p, nivel, periodicidade, periodo) values
 ${catalogo.map((d) => `  (${q(d.codigo)}, ${q(d.nome)}, ${d.credT}, ${d.credP}, ${q(d.nivel)}, ${q(d.periodicidade)}, ${d.periodo ?? 'null'})`).join(',\n')}
 on conflict (codigo) do nothing;

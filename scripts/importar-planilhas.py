@@ -140,7 +140,7 @@ def eh_admin(d):
     return bool(ADMIN) and cadastro[d]['email'].lower() == ADMIN
 
 
-sql = ['-- Docentes e distribuição real das turmas. Gerado por scripts/importar-planilhas.py. NÃO VERSIONAR.', '']
+sql = ['-- Docentes e distribuição real das turmas. Gerado por scripts/importar-planilhas.py. NÃO VERSIONAR.', '', 'set search_path = oferta, public;', '']
 for d in docentes:
     c = cadastro[d]
     sql.append(f"insert into docentes (nome, apelido, email, situacao, admin) values ({q(c['nome'])}, {q(c['apelido'])}, "

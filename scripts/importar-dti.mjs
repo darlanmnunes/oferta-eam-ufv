@@ -110,7 +110,7 @@ ${catalogo.map((d) => `  (${q(d.codigo)}, ${q(d.nome)}, ${d.credT}, ${d.credP}, 
 on conflict (codigo) do nothing;
 
 insert into semestres (id, ano, semestre, situacao, origem) values
-${semestres.map((s) => `  (${q(s.id)}, ${s.ano}, ${s.semestre}, 'fechado', 'RES')`).join(',\n')}
+${semestres.map((s) => `  (${q(s.id)}, ${s.ano}, ${s.semestre}, 'encerrado', 'RES')`).join(',\n')}
 on conflict (id) do nothing;
 
 -- Só preenche semestres que ainda não têm turmas cadastradas no sistema.

@@ -65,8 +65,8 @@ declare v situacao_semestre;
 begin
   select situacao into v from semestres where id = p_semestre;
   if v is null then raise exception 'Semestre % não existe', p_semestre; end if;
-  if v = 'fechado' and not sou_admin() then
-    raise exception 'O semestre % está fechado. Peça ao administrador para reabrir.', replace(p_semestre, '-', '/');
+  if v = 'encerrado' and not sou_admin() then
+    raise exception 'O semestre % está encerrado. Peça ao administrador para reabrir.', replace(p_semestre, '-', '/');
   end if;
 end $$;
 
@@ -263,10 +263,15 @@ create function definir_situacao(p_id text, p_situacao situacao_semestre) return
 language plpgsql security definer set search_path = oferta, public as $$
 begin
   perform _exigir_admin();
+  if not exists (select 1 from semestres where id = p_id) then raise exception 'Semestre não encontrado'; end if;
+  -- só um semestre em andamento: o anterior passa a encerrado
+  if p_situacao = 'andamento' then
+    update semestres set situacao = 'encerrado' where situacao = 'andamento' and id <> p_id;
+  end if;
   update semestres set situacao = p_situacao where id = p_id;
-  if not found then raise exception 'Semestre não encontrado'; end if;
   perform _registrar(p_id, 'semestre_' || p_situacao,
-    case when p_situacao = 'fechado' then 'Fechou ' else 'Reabriu ' end || 'o semestre ' || replace(p_id, '-', '/'));
+    case p_situacao when 'andamento' then 'Iniciou ' when 'encerrado' then 'Encerrou ' else 'Voltou ao planejamento ' end
+    || 'o semestre ' || replace(p_id, '-', '/'));
 end $$;
 
 create function excluir_semestre(p_id text, p_confirmacao text) returns void
@@ -281,22 +286,12 @@ begin
   perform _registrar(p_id, 'semestre_excluido', format('Excluiu o semestre %s com %s turmas', replace(p_id, '-', '/'), v_n));
 end $$;
 
-create function definir_publicacao(p_id text, p_publicado boolean) returns void
-language plpgsql security definer set search_path = oferta, public as $$
-begin
-  perform _exigir_admin();
-  update semestres set publicado = p_publicado where id = p_id;
-  if not found then raise exception 'Semestre não encontrado'; end if;
-  perform _registrar(p_id, case when p_publicado then 'semestre_publicado' else 'semestre_despublicado' end,
-    case when p_publicado then 'Publicou ' else 'Tirou da página pública ' end || 'o semestre ' || replace(p_id, '-', '/'));
-end $$;
-
--- Página pública: só semestres publicados; sem e-mails, carga ou histórico.
+-- Página pública: semestres em andamento e encerrados (nunca os em planejamento); sem e-mails, carga ou histórico.
 create function oferta_publica() returns jsonb
 language sql stable security definer set search_path = oferta, public as $$
   select jsonb_build_object(
     'semestres', coalesce((select jsonb_agg(jsonb_build_object('id', id, 'ano', ano, 'semestre', semestre, 'situacao', situacao) order by id)
-                             from semestres where publicado), '[]'),
+                             from semestres where situacao <> 'planejamento'), '[]'),
     'disciplinas', coalesce((select jsonb_agg(jsonb_build_object('codigo', codigo, 'nome', nome, 'cred_t', cred_t, 'cred_p', cred_p,
                                'nivel', nivel, 'periodicidade', periodicidade, 'periodo', periodo) order by codigo) from disciplinas), '[]'),
     'docentes', coalesce((select jsonb_agg(jsonb_build_object('id', id, 'nome', nome, 'apelido', apelido, 'situacao', situacao)) from docentes), '[]'),
@@ -305,7 +300,7 @@ language sql stable security definer set search_path = oferta, public as $$
         'vagas', t.vagas, 'vagas_cursos', t.vagas_cursos,
         'docentes', (select coalesce(jsonb_agg(jsonb_build_object('id', td.docente_id, 'horas', td.horas)), '[]') from turma_docentes td where td.turma_id = t.id),
         'horarios', (select coalesce(jsonb_agg(jsonb_build_object('dia', h.dia, 'inicio', to_char(h.inicio, 'HH24:MI'), 'fim', to_char(h.fim, 'HH24:MI'), 'sala', h.sala)), '[]') from horarios h where h.turma_id = t.id)))
-      from turmas t join semestres s on s.id = t.semestre_id and s.publicado), '[]'))
+      from turmas t join semestres s on s.id = t.semestre_id and s.situacao <> 'planejamento'), '[]'))
 $$;
 
 -- ---------------------------------------------------------------------------
@@ -373,7 +368,7 @@ grant execute on function
   salvar_turma(jsonb), excluir_turma(uuid), copiar_disciplina(text, text, text), retirar_disciplina(text, text),
   salvar_disciplina(jsonb), excluir_disciplina(text),
   criar_semestre(int, int, text), definir_situacao(text, situacao_semestre), excluir_semestre(text, text),
-  salvar_docente(jsonb), docentes_contato(), definir_publicacao(text, boolean), oferta_publica()
+  salvar_docente(jsonb), docentes_contato(), oferta_publica()
 to authenticated;
 grant usage on schema oferta to anon;
 grant usage on schema oferta to service_role;

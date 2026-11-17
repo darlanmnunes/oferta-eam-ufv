@@ -163,7 +163,7 @@ for sem, turmas in ofertas.items():
         sql.append(f", td as (insert into turma_docentes (turma_id, docente_id) select t.id, d.id from t, docentes d where d.apelido in ({nomes}))")
         hs = ' union all '.join(f"select id, {h['dia'] or 'null'}::smallint, {q(h['inicio'])}::time, {q(h['fim'])}::time, {q(h['sala'])} from t" for h in t['horarios'])
         sql.append(f'insert into horarios (turma_id, dia, inicio, fim, sala) {hs};' if hs else 'select 1 from t;')
-sql.append("\n-- os dois semestres mais recentes aparecem na página pública\nupdate semestres set publicado = true where id in (select id from semestres order by id desc limit 2);")
+sql.append("\n-- o semestre mais recente está em andamento\nupdate semestres set situacao = 'andamento' where id = (select max(id) from semestres);")
 (RAIZ / 'db' / 'privado').mkdir(exist_ok=True)
 (RAIZ / 'db' / 'privado' / '004_docentes.sql').write_text('\n'.join(sql) + '\n')
 

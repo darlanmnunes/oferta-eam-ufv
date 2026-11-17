@@ -16,7 +16,7 @@ export function EditorTurma() {
   useEffect(() => { setT(editando); setExcluir(false) }, [editando])
 
   const sem = dados.semestres.find((s) => s.id === (t?.semestreId ?? semestre?.id))
-  const somenteLeitura = !sem || (sem.situacao === 'fechado' && !eu?.admin)
+  const somenteLeitura = !sem || (sem.situacao === 'encerrado' && !eu?.admin)
   const salas = useMemo(() => [...new Set(dados.turmas.flatMap((x) => x.horarios.map((h) => h.sala)).filter(Boolean) as string[])].sort(), [dados.turmas])
   const ativos = dados.docentes.filter((d) => d.ativo || t?.docentes.includes(d.id))
   const discs = dados.disciplinas.filter((d) => d.ativa || d.codigo === t?.disciplina)
@@ -50,7 +50,7 @@ export function EditorTurma() {
         titulo={titulo}
         sobre={`${sem ? nomeSemestre(sem.id) : ''}${t.disciplina && !nova ? ` | ${dados.disciplinas.find((d) => d.codigo === t.disciplina)?.nome ?? ''}` : ''}`}
         aoFechar={() => editar(null)}
-        pe={somenteLeitura ? <p className="dica">Semestre fechado: só o administrador pode alterar.</p> : (
+        pe={somenteLeitura ? <p className="dica">Semestre encerrado: só o administrador pode alterar.</p> : (
           <>
             {!nova && <button className="btn-texto perigo" onClick={() => setExcluir(true)}>Excluir turma</button>}
             {!nova && <button className="btn btn-claro" onClick={() => {

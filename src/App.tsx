@@ -3,7 +3,7 @@ import { Provedor, ir, useOferta, useRota } from './contexto'
 import { EditorTurma } from './componentes/EditorTurma'
 import { VoltarTopo } from './componentes/VoltarTopo'
 import { api } from './lib/api'
-import { nomeSemestre } from './lib/dominio'
+import { NOME_SITUACAO_SEMESTRE, nomeSemestre } from './lib/dominio'
 import { Admin, Historico } from './telas/Admin'
 import { Conferencia } from './telas/Conferencia'
 import { Disciplinas } from './telas/Disciplinas'
@@ -59,10 +59,10 @@ function Lado({ secao }: { secao: string }) {
           <span>Semestre</span>
           <select value={semestre?.id ?? ''} onChange={(e) => escolherSemestre(e.target.value)}>
             {[...dados.semestres].sort((a, b) => b.id.localeCompare(a.id)).map((s) => (
-              <option key={s.id} value={s.id}>{nomeSemestre(s.id)}{s.situacao === 'fechado' ? ' (fechado)' : ''}</option>
+              <option key={s.id} value={s.id}>{nomeSemestre(s.id)}{s.situacao === 'encerrado' ? '' : ` (${NOME_SITUACAO_SEMESTRE[s.situacao].toLowerCase()})`}</option>
             ))}
           </select>
-          {semestre && <small>{turmas.length} turmas | {semestre.situacao === 'fechado' ? 'fechado para edição' : 'em planejamento'}</small>}
+          {semestre && <small>{turmas.length} turmas | {semestre.situacao === 'encerrado' ? 'encerrado, só consulta' : NOME_SITUACAO_SEMESTRE[semestre.situacao].toLowerCase()}</small>}
         </label>
         <nav id="nav" aria-label="Seções" onClick={() => setAberto(false)}>
           {links.filter((l) => l[2]).map(([r, nome]) => (

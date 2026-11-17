@@ -24,7 +24,7 @@ export function Publica() {
   useEffect(() => {
     api.publica().then((d) => {
       setDados(d)
-      setSem((atual) => atual ?? [...d.semestres].sort((a, b) => b.id.localeCompare(a.id))[0]?.id ?? null)
+      setSem((atual) => atual ?? d.semestres.find((s) => s.situacao === 'andamento')?.id ?? [...d.semestres].sort((a, b) => b.id.localeCompare(a.id))[0]?.id ?? null)
     }).catch((e) => { setDados(vazio); avisar(e.message, 'erro') })
   }, [avisar])
 
@@ -77,16 +77,31 @@ export function Publica() {
           {Array.from({ length: 6 }, (_, i) => <path key={`h${i}`} d={`M 0 ${i * 55 + 20} Q 400 ${i * 55 - 10} 800 ${i * 55 + 20}`} />)}
         </svg>
         <div className="pub-capa-dentro">
-          <p className="sobre">{sem ? NOME_SEM(sem) : 'Oferta do curso'}</p>
+          <p className="sobre">{sem ? `${NOME_SEM(sem)} | ${dados?.semestres.find((s) => s.id === sem)?.situacao === 'andamento' ? 'em andamento' : 'encerrado'}` : 'Oferta do curso'}</p>
           <h1>Disciplinas, horários e salas do curso</h1>
           <p className="pub-capa-texto">Consulte as turmas ofertadas pelo setor de Engenharia de Agrimensura e Cartográfica: dias, horários, salas e docentes, a semana de cada período e a ocupação do LEA.</p>
-          {dados && dados.semestres.length > 1 && (
-            <div className="pub-semestres" role="tablist" aria-label="Semestre">
-              {[...dados.semestres].sort((a, b) => b.id.localeCompare(a.id)).map((s) => (
-                <button key={s.id} role="tab" aria-selected={s.id === sem} onClick={() => setSem(s.id)}>{nomeSemestre(s.id)}</button>
-              ))}
-            </div>
-          )}
+          {dados && dados.semestres.length > 1 && (() => {
+            const ord = [...dados.semestres].sort((a, b) => b.id.localeCompare(a.id))
+            const destaque = ord.slice(0, 2)
+            const outros = ord.slice(2)
+            return (
+              <div className="pub-semestres-linha">
+                <div className="pub-semestres" role="group" aria-label="Semestre">
+                  {destaque.map((s) => (
+                    <button key={s.id} aria-pressed={s.id === sem} onClick={() => setSem(s.id)}>
+                      {nomeSemestre(s.id)}{s.situacao === 'andamento' && <small> em andamento</small>}
+                    </button>
+                  ))}
+                </div>
+                {outros.length > 0 && (
+                  <select aria-label="Semestres anteriores" className="pub-anteriores" value={outros.some((s) => s.id === sem) ? sem! : ''} onChange={(e) => e.target.value && setSem(e.target.value)}>
+                    <option value="">Semestres anteriores</option>
+                    {outros.map((s) => <option key={s.id} value={s.id}>{nomeSemestre(s.id)}</option>)}
+                  </select>
+                )}
+              </div>
+            )
+          })()}
           {turmas.length > 0 && (
             <dl className="pub-numeros">
               <div><dt>Disciplinas</dt><dd>{new Set(turmas.map((t) => t.disciplina)).size}</dd></div>
@@ -100,7 +115,7 @@ export function Publica() {
 
       <main className="pub-corpo" id="conteudo">
         {dados === null ? <p className="carregando">Carregando a oferta…</p> : !sem ? (
-          <Vazio titulo="Nenhum semestre publicado ainda">A oferta aparece aqui quando a coordenação publicar o semestre.</Vazio>
+          <Vazio titulo="Nenhum semestre em andamento ainda">A oferta aparece aqui quando o semestre for iniciado pela coordenação.</Vazio>
         ) : (
           <>
             <section id="disciplinas" className="pub-secao nao-imprime" aria-labelledby="t-disc">

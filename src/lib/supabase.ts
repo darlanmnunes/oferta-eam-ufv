@@ -18,7 +18,7 @@ export function criarApiSupabase(url: string, chave: string): Api {
     id: d.id, nome: d.nome, apelido: d.apelido, chMinima: Number(d.ch_minima ?? 8), situacao: d.situacao, ativo: d.situacao === 'ativo', admin: !!d.admin,
   })
   const hora = (t: string | null) => (t ? t.slice(0, 5) : null)
-  const semestre = (x: any): Semestre => ({ id: x.id, ano: x.ano, semestre: x.semestre, situacao: x.situacao, origem: x.origem ?? null, publicado: !!x.publicado })
+  const semestre = (x: any): Semestre => ({ id: x.id, ano: x.ano, semestre: x.semestre, situacao: x.situacao, origem: x.origem ?? null })
   const disciplina = (x: any): Disciplina => ({
     codigo: x.codigo, nome: x.nome, credT: x.cred_t, credP: x.cred_p, nivel: x.nivel,
     periodicidade: x.periodicidade, periodo: x.periodo, ativa: x.ativa ?? true, obs: x.obs ?? null,
@@ -73,7 +73,7 @@ export function criarApiSupabase(url: string, chave: string): Api {
 
     async carregar(): Promise<Dados> {
       const [s, d, p, t] = await Promise.all([
-        sb.from('semestres').select('id, ano, semestre, situacao, origem, publicado').order('id'),
+        sb.from('semestres').select('id, ano, semestre, situacao, origem').order('id'),
         sb.from('disciplinas').select('*').order('codigo'),
         sb.from('docentes').select('id, nome, apelido, ch_minima, situacao, admin').order('apelido'),
         lerTurmas(),
@@ -123,7 +123,6 @@ export function criarApiSupabase(url: string, chave: string): Api {
         p: { id: d.id ?? null, nome: d.nome, apelido: d.apelido, email: d.email ?? null, ch_minima: d.chMinima ?? 8, situacao: d.situacao ?? 'ativo', admin: d.admin ?? false },
       })
     },
-    definirPublicacao: async (id, publicado) => { await rpc('definir_publicacao', { p_id: id, p_publicado: publicado }) },
     async publica() {
       const x = await rpc<any>('oferta_publica')
       return {

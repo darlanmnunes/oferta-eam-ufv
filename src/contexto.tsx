@@ -28,7 +28,7 @@ const lerSem = () => { try { return localStorage.getItem(CHAVE_SEM) } catch { re
 
 function semestrePadrao(s: Semestre[]): string | null {
   const ord = [...s].sort((a, b) => b.id.localeCompare(a.id))
-  return (ord.find((x) => x.situacao === 'planejamento') ?? ord[0])?.id ?? null
+  return (ord.find((x) => x.situacao === 'planejamento') ?? ord.find((x) => x.situacao === 'andamento') ?? ord[0])?.id ?? null
 }
 
 export function Provedor({ children }: { children: ReactNode }) {
@@ -80,7 +80,7 @@ export function Provedor({ children }: { children: ReactNode }) {
     return {
       pronto, email, eu, dados, semestre,
       turmas: semestre ? dados.turmas.filter((t) => t.semestreId === semestre.id) : [],
-      podeEditar: !!eu && !!semestre && (semestre.situacao === 'planejamento' || eu.admin),
+      podeEditar: !!eu && !!semestre && (semestre.situacao !== 'encerrado' || eu.admin),
       escolherSemestre(id) {
         setSemId(id)
         try { localStorage.setItem(CHAVE_SEM, id) } catch { /* sem armazenamento */ }

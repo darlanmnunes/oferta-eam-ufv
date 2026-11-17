@@ -4,7 +4,7 @@ import { Cabecalho, Vazio } from '../componentes/pecas'
 import { novaTurma } from '../componentes/EditorTurma'
 import { Rosca, type Fatia } from '../componentes/Rosca'
 import {
-  DIAS, DIAS_CURTOS, NOME_SITUACAO, NOME_TIPO, cargas, conflitos, duracao, fmtHoras, grupoSala, horasTurma, minutos, nivelDe,
+  DIAS, DIAS_CURTOS, NOME_SITUACAO, NOME_SITUACAO_SEMESTRE, NOME_TIPO, cargas, conflitos, duracao, fmtHoras, grupoSala, horasTurma, minutos, nivelDe,
   nomeSemestre, pendencias, revisao, rotulo,
 } from '../lib/dominio'
 import type { Turma } from '../lib/tipos'
@@ -88,7 +88,7 @@ export function Painel() {
   return (
     <main className="pagina">
       <Cabecalho sobre="Painel" titulo={`Oferta ${nomeSemestre(semestre.id)}`}
-        texto={<>{semestre.situacao === 'planejamento' ? 'Em planejamento' : 'Fechado'}{rev?.ref && <> | comparado com {nomeSemestre(rev.ref.id)}</>}</>}>
+        texto={<>{NOME_SITUACAO_SEMESTRE[semestre.situacao]}{rev?.ref && <> | comparado com {nomeSemestre(rev.ref.id)}</>}</>}>
         {podeEditar && <button className="btn" onClick={() => editar(novaTurma(semestre.id))}>Nova turma</button>}
       </Cabecalho>
 

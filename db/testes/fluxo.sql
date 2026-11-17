@@ -17,12 +17,13 @@ insert into docentes (nome, apelido, email, admin) values ('Admin Teste', 'Admin
 
 set role authenticated;
 
--- 0. visitante sem login: só a oferta publicada
+-- 0. visitante sem login: semestres em andamento e encerrados, nunca os em planejamento
 reset role;
-update semestres set publicado = true where id = '2026-2';
+update semestres set situacao = 'planejamento' where id = '2026-2';
 set role anon;
 do $$ begin
-  if jsonb_array_length(oferta_publica() -> 'semestres') <> 1 then raise exception 'página pública mostra semestre não publicado'; end if;
+  if (oferta_publica() -> 'semestres')::text like '%2026-2%' then raise exception 'página pública mostra semestre em planejamento'; end if;
+  if jsonb_array_length(oferta_publica() -> 'semestres') = 0 then raise exception 'página pública sem semestres'; end if;
   if jsonb_array_length(oferta_publica() -> 'turmas') = 0 then raise exception 'página pública sem turmas'; end if;
   if (oferta_publica() -> 'docentes')::text like '%@%' then raise exception 'página pública com e-mail'; end if;
 end $$;
@@ -67,7 +68,6 @@ do $$ begin
        where t.semestre_id = '2027-1' and t.disciplina_codigo = 'EAM 300' and t.tipo = 'T' and t.numero = 1) <> array['2.0', null] then
     raise exception 'horas por docente não gravadas'; end if;
 end $$;
-select pg_temp.deve_falhar($$select definir_publicacao('2027-1', true)$$, 'docente publica semestre');
 -- nova turma, duplicada e exclusão
 select salvar_turma('{"semestre_id":"2027-1","disciplina_codigo":"EAM 311","tipo":"P","numero":3,"horarios":[{"dia":4,"inicio":"14:00","fim":"16:00","sala":"LEA101"}]}');
 select pg_temp.deve_falhar($$select salvar_turma('{"semestre_id":"2027-1","disciplina_codigo":"EAM 311","tipo":"P","numero":3}')$$, 'turma duplicada');
@@ -82,7 +82,7 @@ select salvar_disciplina('{"codigo":"eam 999","nome":"Disciplina Nova","cred_t":
 select excluir_disciplina('EAM 999');
 select pg_temp.deve_falhar($$select excluir_disciplina('EAM 300')$$, 'excluir disciplina já ofertada');
 -- o que só o administrador faz
-select pg_temp.deve_falhar($$select definir_situacao('2027-1', 'fechado')$$, 'docente fecha semestre');
+select pg_temp.deve_falhar($$select definir_situacao('2027-1', 'encerrado')$$, 'docente encerra semestre');
 select pg_temp.deve_falhar($$select excluir_semestre('2027-1', '2027-1')$$, 'docente exclui semestre');
 select pg_temp.deve_falhar($$select salvar_docente('{"nome":"Outro Docente","apelido":"Outro"}')$$, 'docente cadastra docente');
 -- nada de escrever direto nas tabelas nem mexer na estrutura
@@ -93,12 +93,17 @@ select pg_temp.deve_falhar($$drop table turmas$$, 'drop table');
 select pg_temp.deve_falhar($$alter table turmas add column x int$$, 'alter table');
 select pg_temp.deve_falhar($$select _registrar('2027-1','x','x')$$, 'função interna');
 
--- 4. semestre fechado fica só para leitura
+-- 4. só um semestre em andamento; encerrado fica só para leitura
 select pg_temp.como('00000000-0000-0000-0000-000000000001', 'admin@exemplo.ufv.br');
-select definir_situacao('2027-1', 'fechado');
-select definir_publicacao('2027-1', true);
+select definir_situacao('2026-1', 'andamento');
+select definir_situacao('2027-1', 'andamento');
+do $$ begin
+  if (select count(*) from semestres where situacao = 'andamento') <> 1 then raise exception 'mais de um semestre em andamento'; end if;
+  if (select situacao from semestres where id = '2026-1') <> 'encerrado' then raise exception 'anterior não foi encerrado'; end if;
+end $$;
+select definir_situacao('2027-1', 'encerrado');
 select pg_temp.como('00000000-0000-0000-0000-000000000002', 'docente@exemplo.ufv.br');
-select pg_temp.deve_falhar($$select retirar_disciplina('2027-1', 'EAM 300')$$, 'editar semestre fechado');
+select pg_temp.deve_falhar($$select retirar_disciplina('2027-1', 'EAM 300')$$, 'editar semestre encerrado');
 select pg_temp.como('00000000-0000-0000-0000-000000000001', 'admin@exemplo.ufv.br');
 select salvar_docente(jsonb_build_object('id', (select id from docentes where apelido = 'Docente'), 'nome', 'Docente Teste', 'apelido', 'Docente', 'email', 'docente@exemplo.ufv.br', 'situacao', 'aposentado'));
 select pg_temp.como('00000000-0000-0000-0000-000000000002', 'docente@exemplo.ufv.br');

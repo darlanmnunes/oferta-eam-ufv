@@ -5,7 +5,7 @@ import exemplo from '../dados/demo.json'
 import { rotulo } from './dominio'
 import type { Api, Dados, Docente, Evento, Turma } from './tipos'
 
-const CHAVE = 'oferta-eam-demo-v2'
+const CHAVE = 'oferta-eam-demo-v3'
 const CHAVE_EU = 'oferta-eam-demo-eu'
 
 interface Estado extends Dados { historico: Evento[] }
@@ -46,8 +46,8 @@ function inicial(): Estado {
       ...ex.extras.map((e) => ({ codigo: e.codigo, nome: e.nome, credT: 0, credP: 0, nivel: e.nivel as 'grad' | 'pos', periodicidade: 'eventual' as const, periodo: null, ativa: true, obs: null })),
     ].sort((a, b) => a.codigo.localeCompare(b.codigo)),
     semestres: dti.semestres.map((s, i, l) => ({
-      ...s, semestre: s.semestre as 1 | 2, situacao: abertos.has(s.id) ? 'planejamento' as const : 'fechado' as const,
-      origem: abertos.has(s.id) ? 'planilha' : 'RES', publicado: i >= l.length - 2,
+      ...s, semestre: s.semestre as 1 | 2, situacao: i === l.length - 1 ? 'andamento' as const : 'encerrado' as const,
+      origem: abertos.has(s.id) ? 'planilha' : 'RES',
     })),
     turmas,
     historico: [],
@@ -77,7 +77,7 @@ function exigirAdmin() { const e = exigirDocente(); if (!e.admin) throw new Erro
 function exigirAberto(sem: string) {
   const s = estado.semestres.find((x) => x.id === sem)
   if (!s) throw new Error(`Semestre ${sem} não existe`)
-  if (s.situacao === 'fechado' && !eu()?.admin) throw new Error(`O semestre ${sem.replace('-', '/')} está fechado. Peça ao administrador para reabrir.`)
+  if (s.situacao === 'encerrado' && !eu()?.admin) throw new Error(`O semestre ${sem.replace('-', '/')} está encerrado. Peça ao administrador para reabrir.`)
 }
 function registrar(semestreId: string | null, acao: string, resumo: string) {
   estado.historico.unshift({ id: Date.now() + seq++, quando: new Date().toISOString(), autor: eu()?.apelido ?? 'sistema', semestreId, acao, resumo })
@@ -192,7 +192,7 @@ export const demo: Api = {
     exigirDocente()
     const id = `${ano}-${semestre}`
     if (estado.semestres.some((s) => s.id === id)) throw new Error(`O semestre ${ano}/${semestre} já existe`)
-    estado.semestres.push({ id, ano, semestre: semestre as 1 | 2, situacao: 'planejamento', origem, publicado: false })
+    estado.semestres.push({ id, ano, semestre: semestre as 1 | 2, situacao: 'planejamento', origem })
     const novas = origem ? copiarTurmas(estado.turmas.filter((t) => t.semestreId === origem), id) : []
     estado.turmas.push(...novas)
     registrar(id, 'semestre_criado', `Criou o semestre ${ano}/${semestre}${origem ? ` a partir de ${origem.replace('-', '/')} (${novas.length} turmas)` : ' vazio'}`)
@@ -202,8 +202,9 @@ export const demo: Api = {
     exigirAdmin()
     const sem = estado.semestres.find((x) => x.id === id)
     if (!sem) throw new Error('Semestre não encontrado')
+    if (s === 'andamento') estado.semestres.forEach((x) => { if (x.situacao === 'andamento' && x.id !== id) x.situacao = 'encerrado' })
     sem.situacao = s
-    registrar(id, `semestre_${s}`, `${s === 'fechado' ? 'Fechou' : 'Reabriu'} o semestre ${id.replace('-', '/')}`)
+    registrar(id, `semestre_${s}`, `${s === 'andamento' ? 'Iniciou' : s === 'encerrado' ? 'Encerrou' : 'Voltou ao planejamento'} o semestre ${id.replace('-', '/')}`)
   },
   async excluirSemestre(id, confirmacao) {
     exigirAdmin()
@@ -225,16 +226,9 @@ export const demo: Api = {
     else estado.docentes.push({ ...base, id: novoId(), ligado: false } as Docente)
     registrar(null, 'docente_salvo', `Atualizou o cadastro de ${base.apelido}`)
   },
-  async definirPublicacao(id, publicado) {
-    exigirAdmin()
-    const s = estado.semestres.find((x) => x.id === id)
-    if (!s) throw new Error('Semestre não encontrado')
-    s.publicado = publicado
-    registrar(id, publicado ? 'semestre_publicado' : 'semestre_despublicado', `${publicado ? 'Publicou' : 'Tirou da página pública'} o semestre ${id.replace('-', '/')}`)
-  },
   async publica() {
     await espera()
-    const pub = new Set(estado.semestres.filter((s) => s.publicado).map((s) => s.id))
+    const pub = new Set(estado.semestres.filter((s) => s.situacao !== 'planejamento').map((s) => s.id))
     return copia({
       semestres: estado.semestres.filter((s) => pub.has(s.id)),
       disciplinas: estado.disciplinas,

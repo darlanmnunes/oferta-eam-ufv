@@ -13,7 +13,11 @@ create type periodicidade as enum (
   'ambos',     -- todo semestre
   'eventual'   -- sem regularidade (tópicos, optativas, pós)
 );
-create type situacao_semestre as enum ('planejamento', 'fechado');
+create type situacao_semestre as enum (
+  'planejamento',  -- docentes montam a oferta; fora da página pública
+  'andamento',     -- semestre em curso: aparece na página pública e ainda aceita ajustes
+  'encerrado'      -- só leitura; continua na página pública como histórico
+);
 create type tipo_turma as enum ('T', 'P', 'TP');
 create type situacao_docente as enum ('ativo', 'afastado', 'aposentado', 'desligado');
 
@@ -56,7 +60,6 @@ create table semestres (
   semestre   smallint not null check (semestre in (1, 2)),
   situacao   situacao_semestre not null default 'planejamento',
   origem     text,                                                 -- de onde veio a oferta inicial
-  publicado  boolean not null default false,                       -- aparece na página pública
   obs        text,
   criado_em  timestamptz not null default now(),
   check (id = ano || '-' || semestre)

@@ -12,7 +12,7 @@ LEA. O painel e as alterações são restritos aos docentes do curso, com a cont
 
 ## O que faz
 
-- **Página inicial pública** com a oferta dos semestres publicados: disciplinas e turmas, horários, salas e docentes,
+- **Página inicial pública** com a oferta do semestre em andamento e dos anteriores: disciplinas e turmas, horários, salas e docentes,
   grade semanal de cada período e horário do LEA para imprimir.
 - **Painel** interativo: indicadores, gráficos de rosca e filtros cruzados (nível, tipo de aula, local, docente),
   carga por docente (graduação e pós, com o mínimo de 8 h), mapa das aulas simultâneas com as turmas de cada hora,
@@ -25,7 +25,8 @@ LEA. O painel e as alterações são restritos aos docentes do curso, com a cont
 - **Conferência**: o que entrou e saiu em relação ao mesmo semestre do ano anterior, disciplinas esperadas
   pela periodicidade (1º semestre, 2º semestre, todo semestre) e comparação com o horário oficial do Registro Escolar (RES).
 - **Disciplinas**: catálogo com a periodicidade e o histórico de oferta desde 2022.
-- **Semestres**: cada novo semestre começa como cópia de outro; o administrador fecha, reabre e exclui.
+- **Semestres**: cada novo semestre começa como cópia de outro e passa por três situações: em planejamento (só os
+  docentes veem), em andamento (na página pública, ainda aceita ajustes) e encerrado (só consulta).
 - **Histórico** de toda alteração, com autor e data, que não pode ser apagado.
 
 ```mermaid
@@ -34,7 +35,7 @@ flowchart LR
   B --> C[Ajuste de turmas,<br>docentes, horários e salas]
   C --> D[Conflitos e carga<br>no painel]
   D --> E[Conferir com o<br>horário do RES]
-  E --> F[Publicar na página,<br>imprimir e fechar]
+  E --> F[Iniciar o semestre,<br>imprimir e encerrar]
 ```
 
 <details>

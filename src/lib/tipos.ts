@@ -1,7 +1,7 @@
 export type Nivel = 'grad' | 'pos'
 export type Periodicidade = 'impar' | 'par' | 'ambos' | 'eventual'
 export type Tipo = 'T' | 'P' | 'TP'
-export type Situacao = 'planejamento' | 'fechado'
+export type Situacao = 'planejamento' | 'andamento' | 'encerrado'
 export type SituacaoDocente = 'ativo' | 'afastado' | 'aposentado' | 'desligado'
 
 export interface Disciplina {
@@ -22,7 +22,6 @@ export interface Semestre {
   semestre: 1 | 2
   situacao: Situacao
   origem: string | null
-  publicado: boolean
 }
 
 export interface Docente {
@@ -102,7 +101,6 @@ export interface Api {
   definirSituacao(id: string, s: Situacao): Promise<void>
   excluirSemestre(id: string, confirmacao: string): Promise<void>
   salvarDocente(d: Partial<Docente> & { nome: string; apelido: string }): Promise<void>
-  definirPublicacao(id: string, publicado: boolean): Promise<void>
-  /** Oferta dos semestres publicados, sem login. */
+  /** Oferta dos semestres em andamento e encerrados, sem login. */
   publica(): Promise<Dados>
 }

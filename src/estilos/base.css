@@ -195,7 +195,8 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--azul); f
 .barra-valor.sit-ok, .barra-valor.sit-abaixo, .barra-valor.sit-elevada, .barra-valor.sit-verificar { background: none; color: var(--azul); }
 .barra-valor.sit-abaixo, .barra-valor.sit-verificar { color: var(--neso); }
 .sem-planejamento { background: var(--ambar-fundo); color: #7d5700; }
-.sem-fechado { background: var(--papel-2); }
+.sem-andamento { background: var(--verde-fundo); color: var(--verde); }
+.sem-encerrado { background: var(--papel-2); }
 .per-impar { background: var(--t); color: var(--azul-2); }
 .per-par { background: var(--p); color: #7d5700; }
 .per-ambos { background: var(--verde-fundo); color: var(--verde); }
@@ -499,7 +500,12 @@ button.barra-linha[aria-pressed='true'] { background: var(--papel-2); }
 .pub-capa-texto { color: #cdd6ec; max-width: 62ch; margin-top: 14px; font-size: 1.05rem; }
 .pub-semestres { display: inline-flex; gap: 4px; margin-top: 22px; padding: 4px; background: rgba(255,255,255,0.08); border-radius: 8px; }
 .pub-semestres button { background: none; border: 0; color: #dfe6f7; font-weight: 600; min-height: 38px; padding: 0 16px; border-radius: 6px; cursor: pointer; }
-.pub-semestres button[aria-selected='true'] { background: #fff; color: var(--azul); }
+.pub-semestres button[aria-pressed='true'] { background: #fff; color: var(--azul); }
+.pub-semestres small { font-weight: 500; font-size: 0.78rem; margin-left: 4px; opacity: 0.8; }
+.pub-semestres-linha { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 22px; }
+.pub-semestres-linha .pub-semestres { margin-top: 0; }
+.pub-anteriores { width: auto; min-height: 44px; background: rgba(255,255,255,0.08); color: #fff; border-color: rgba(255,255,255,0.25); }
+.pub-anteriores option { color: var(--azul); }
 .pub-numeros { display: grid; grid-template-columns: repeat(4, minmax(0, max-content)); gap: 12px 40px; margin: 28px 0 0; }
 .pub-numeros dt { font: 500 0.75rem var(--mono); text-transform: uppercase; letter-spacing: 0.06em; color: #aab6d4; }
 .pub-numeros dd { margin: 2px 0 0; font: 700 2.2rem/1 var(--titulo); }

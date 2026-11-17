@@ -6,6 +6,7 @@ export const DIAS_CURTOS: Record<number, string> = { 2: 'Seg', 3: 'Ter', 4: 'Qua
 export const NOME_PERIODICIDADE: Record<Periodicidade, string> = {
   impar: '1º semestre', par: '2º semestre', ambos: 'Todo semestre', eventual: 'Eventual',
 }
+export const NOME_SITUACAO_SEMESTRE = { planejamento: 'Em planejamento', andamento: 'Em andamento', encerrado: 'Encerrado' } as const
 export const NOME_TIPO = { T: 'Teórica', P: 'Prática', TP: 'Teórica e prática' } as const
 
 export const minutos = (h: string | null) => (h ? Number(h.slice(0, 2)) * 60 + Number(h.slice(3, 5)) : 0)

@@ -59,16 +59,16 @@ insert into disciplinas (codigo, nome, cred_t, cred_p, nivel, periodicidade, per
 on conflict (codigo) do nothing;
 
 insert into semestres (id, ano, semestre, situacao, origem) values
-  ('2022-1', 2022, 1, 'fechado', 'RES'),
-  ('2022-2', 2022, 2, 'fechado', 'RES'),
-  ('2023-1', 2023, 1, 'fechado', 'RES'),
-  ('2023-2', 2023, 2, 'fechado', 'RES'),
-  ('2024-1', 2024, 1, 'fechado', 'RES'),
-  ('2024-2', 2024, 2, 'fechado', 'RES'),
-  ('2025-1', 2025, 1, 'fechado', 'RES'),
-  ('2025-2', 2025, 2, 'fechado', 'RES'),
-  ('2026-1', 2026, 1, 'fechado', 'RES'),
-  ('2026-2', 2026, 2, 'fechado', 'RES')
+  ('2022-1', 2022, 1, 'encerrado', 'RES'),
+  ('2022-2', 2022, 2, 'encerrado', 'RES'),
+  ('2023-1', 2023, 1, 'encerrado', 'RES'),
+  ('2023-2', 2023, 2, 'encerrado', 'RES'),
+  ('2024-1', 2024, 1, 'encerrado', 'RES'),
+  ('2024-2', 2024, 2, 'encerrado', 'RES'),
+  ('2025-1', 2025, 1, 'encerrado', 'RES'),
+  ('2025-2', 2025, 2, 'encerrado', 'RES'),
+  ('2026-1', 2026, 1, 'encerrado', 'RES'),
+  ('2026-2', 2026, 2, 'encerrado', 'RES')
 on conflict (id) do nothing;
 
 -- Só preenche semestres que ainda não têm turmas cadastradas no sistema.

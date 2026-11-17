@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { ir, useOferta } from '../contexto'
 import { Campo, Cabecalho, Confirmar } from '../componentes/pecas'
 import { api } from '../lib/api'
-import { fmtHoras, horasTurma, nomeSemestre, referencia } from '../lib/dominio'
+import { NOME_SITUACAO_SEMESTRE, fmtHoras, horasTurma, nomeSemestre, referencia } from '../lib/dominio'
 
 export function Semestres() {
   const { dados, eu, agir, escolherSemestre, semestre: atual } = useOferta()
@@ -54,24 +54,25 @@ export function Semestres() {
 
       <div className="tabela-rolagem">
         <table className="tabela">
-          <thead><tr><th scope="col">Semestre</th><th scope="col">Situação</th><th scope="col" className="num">Disciplinas</th><th scope="col" className="num">Turmas</th><th scope="col" className="num">h/sem</th><th scope="col">Origem</th><th scope="col">Página pública</th><th scope="col"><span className="so-leitor">Ações</span></th></tr></thead>
+          <thead><tr><th scope="col">Semestre</th><th scope="col">Situação</th><th scope="col" className="num">Disciplinas</th><th scope="col" className="num">Turmas</th><th scope="col" className="num">h/sem</th><th scope="col">Origem</th><th scope="col"><span className="so-leitor">Ações</span></th></tr></thead>
           <tbody>
             {[...dados.semestres].sort((a, b) => b.id.localeCompare(a.id)).map((s) => {
               const ts = dados.turmas.filter((t) => t.semestreId === s.id)
               return (
                 <tr key={s.id} className={s.id === atual?.id ? 'linha-atual' : ''}>
                   <th scope="row"><button className="link forte" onClick={() => { escolherSemestre(s.id); ir('/') }}>{nomeSemestre(s.id)}</button></th>
-                  <td><span className={`selo sem-${s.situacao}`}>{s.situacao === 'planejamento' ? 'Em planejamento' : 'Fechado'}</span></td>
+                  <td><span className={`selo sem-${s.situacao}`}>{NOME_SITUACAO_SEMESTRE[s.situacao]}</span></td>
                   <td className="num">{new Set(ts.map((t) => t.disciplina)).size}</td>
                   <td className="num">{ts.length}</td>
                   <td className="num">{fmtHoras(ts.reduce((x, t) => x + horasTurma(t), 0))}</td>
                   <td>{s.origem ? (s.origem.includes('-') ? `cópia de ${nomeSemestre(s.origem)}` : s.origem === 'RES' || s.origem === 'DTI' ? 'Registro Escolar (RES)' : s.origem) : '-'}</td>
-                  <td>{s.publicado ? <span className="selo sit-ok">Publicado</span> : <span className="dica">não</span>}</td>
                   <td className="acoes-linha">
-                    {eu?.admin && <button className="btn btn-pequeno btn-claro" onClick={() => agir(() => api.definirPublicacao(s.id, !s.publicado), s.publicado ? `${nomeSemestre(s.id)} saiu da página pública.` : `${nomeSemestre(s.id)} publicado na página pública.`)}>{s.publicado ? 'Despublicar' : 'Publicar'}</button>}
-                    {eu?.admin && (s.situacao === 'planejamento'
-                      ? <button className="btn btn-pequeno btn-claro" onClick={() => agir(() => api.definirSituacao(s.id, 'fechado'), `${nomeSemestre(s.id)} fechado.`)}>Fechar</button>
-                      : <button className="btn btn-pequeno btn-claro" onClick={() => agir(() => api.definirSituacao(s.id, 'planejamento'), `${nomeSemestre(s.id)} reaberto.`)}>Reabrir</button>)}
+                    {eu?.admin && s.situacao === 'planejamento' && <button className="btn btn-pequeno" onClick={() => agir(() => api.definirSituacao(s.id, 'andamento'), `${nomeSemestre(s.id)} em andamento e na página pública.`)}>Iniciar</button>}
+                    {eu?.admin && s.situacao === 'andamento' && <>
+                      <button className="btn btn-pequeno btn-claro" onClick={() => agir(() => api.definirSituacao(s.id, 'encerrado'), `${nomeSemestre(s.id)} encerrado.`)}>Encerrar</button>
+                      <button className="btn-texto" onClick={() => agir(() => api.definirSituacao(s.id, 'planejamento'), `${nomeSemestre(s.id)} voltou ao planejamento e saiu da página pública.`)}>Voltar ao planejamento</button>
+                    </>}
+                    {eu?.admin && s.situacao === 'encerrado' && <button className="btn btn-pequeno btn-claro" onClick={() => agir(() => api.definirSituacao(s.id, 'andamento'), `${nomeSemestre(s.id)} reaberto, em andamento.`)}>Reabrir</button>}
                     {eu?.admin && <button className="btn-texto perigo" onClick={() => { setExcluir(s.id); setConfirmacao('') }}>Excluir</button>}
                   </td>
                 </tr>
@@ -80,7 +81,7 @@ export function Semestres() {
           </tbody>
         </table>
       </div>
-      <p className="nota">Semestre fechado fica só para consulta; o administrador pode reabrir. Publicado aparece na página inicial, aberta a qualquer visitante, sem carga docente nem histórico. Só o administrador publica e exclui semestres.</p>
+      <p className="nota">Em planejamento: os docentes montam a oferta, fora da página pública. Em andamento: é o semestre em curso, aparece na página inicial e ainda aceita ajustes; ao iniciar um semestre, o anterior é encerrado. Encerrado: só consulta e continua na página inicial como histórico. Só o administrador muda a situação e exclui semestres.</p>
 
       <Confirmar aberto={!!excluir} titulo={`Excluir o semestre ${excluir ? nomeSemestre(excluir) : ''}?`} perigo acao="Excluir semestre"
         texto={<>Todas as turmas deste semestre serão apagadas e não há como desfazer. O histórico continua registrando o que existia. Para confirmar, digite <b className="mono">{excluir}</b>.</>}

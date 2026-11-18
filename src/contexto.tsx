@@ -23,8 +23,9 @@ const vazio: Dados = { semestres: [], disciplinas: [], docentes: [], turmas: [] 
 const Ctx = createContext<Oferta | null>(null)
 export const useOferta = () => useContext(Ctx)!
 
+// A escolha vale só para a aba aberta: cada nova visita começa no semestre atual.
 const CHAVE_SEM = 'oferta-eam-semestre'
-const lerSem = () => { try { return localStorage.getItem(CHAVE_SEM) } catch { return null } }
+const lerSem = () => { try { return sessionStorage.getItem(CHAVE_SEM) } catch { return null } }
 
 function semestrePadrao(s: Semestre[]): string | null {
   const ord = [...s].sort((a, b) => b.id.localeCompare(a.id))
@@ -83,7 +84,7 @@ export function Provedor({ children }: { children: ReactNode }) {
       podeEditar: !!eu && !!semestre && (semestre.situacao !== 'encerrado' || eu.admin),
       escolherSemestre(id) {
         setSemId(id)
-        try { localStorage.setItem(CHAVE_SEM, id) } catch { /* sem armazenamento */ }
+        try { sessionStorage.setItem(CHAVE_SEM, id) } catch { /* sem armazenamento */ }
       },
       recarregar, agir, avisar, editando, editar: setEditando,
     }

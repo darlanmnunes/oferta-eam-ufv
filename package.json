@@ -1,7 +1,7 @@
 {
   "name": "oferta-eam-ufv",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.0.0",
   "type": "module",
   "description": "Oferta de disciplinas | Engenharia de Agrimensura e Cartográfica | UFV",
   "scripts": {

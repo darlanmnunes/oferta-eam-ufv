@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "Se usar este software, cite-o conforme os metadados abaixo."
+type: software
+title: "Oferta de Disciplinas EAM: sistema de planejamento da oferta de disciplinas da Engenharia de Agrimensura e Cartográfica da UFV"
+abstract: "Sistema web para planejar a oferta semestral de disciplinas de um curso de graduação: turmas, horários, salas e carga docente, com conferência pela periodicidade das disciplinas e pelo horário oficial do Registro Escolar, detecção de conflitos, grades para impressão e histórico imutável de alterações."
+version: "1.0.1"
+date-released: "2026-11-23"
+license: AGPL-3.0-or-later
+repository-code: "https://github.com/darlanmnunes/oferta-eam-ufv"
+url: "https://darlanmnunes.github.io/oferta-eam-ufv/"
+authors:
+  - family-names: "Nunes"
+    given-names: "Darlan Miranda"
+    orcid: "https://orcid.org/0000-0001-5566-7919"
+    email: "darlan.nunes@ufv.br"
+    affiliation: "Universidade Federal de Viçosa, Departamento de Engenharia Civil"
+keywords:
+  - gestão acadêmica
+  - oferta de disciplinas
+  - grade horária
+  - carga docente
+  - Engenharia de Agrimensura e Cartográfica
+  - Supabase
+  - React

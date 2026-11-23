@@ -1,0 +1,32 @@
+Oferta de Disciplinas EAM: sistema de planejamento da oferta de disciplinas da Engenharia de Agrimensura e Cartográfica da UFV
+Copyright (C) 2026 Universidade Federal de Viçosa (UFV)
+Autor: Darlan Miranda Nunes (Setor de Engenharia de Agrimensura e Cartográfica / Departamento de Engenharia Civil, UFV)
+https://orcid.org/0000-0001-5566-7919
+
+Escopo: planejamento da oferta semestral de disciplinas do curso (turmas, horários, salas
+e carga docente), com conferência pelo horário oficial do Registro Escolar, detecção de
+conflitos e grades para impressão. Código em https://github.com/darlanmnunes/oferta-eam-ufv
+
+Sistema relacionado: o Acervo do LEA (https://github.com/darlanmnunes/lea-eam-ufv) é outro
+programa, com código, versões, licença e citação próprios. Os dois usam o mesmo projeto
+Supabase e o mesmo login, mas a Oferta fica no esquema `oferta`, com tabelas e permissões
+separadas. Este aviso e a licença abaixo valem só para a Oferta de Disciplinas EAM.
+
+Este programa é software livre: pode ser redistribuído e modificado nos termos da
+GNU Affero General Public License, versão 3 ou posterior (AGPL-3.0-or-later),
+publicada pela Free Software Foundation. O texto integral está no arquivo LICENSE.
+
+Este programa é distribuído na expectativa de ser útil, mas SEM QUALQUER GARANTIA,
+nem mesmo a garantia implícita de COMERCIABILIDADE ou de ADEQUAÇÃO A UM FIM ESPECÍFICO.
+
+Quem oferecer uma versão modificada deste programa como serviço em rede deve
+disponibilizar o código-fonte correspondente aos usuários desse serviço (AGPL, seção 13).
+
+Itens NÃO cobertos pela licença acima:
+- Marcas e logotipos da UFV e da Engenharia de Agrimensura e Cartográfica (public/marca/):
+  uso restrito à identificação institucional deste sistema.
+- Dados de horários importados do Registro Escolar (DTI/UFV): informação pública da UFV.
+- Dados pessoais de docentes, servidores e estudantes: não fazem parte do repositório
+  e não podem ser publicados com base nesta licença.
+
+Como citar: ver o arquivo CITATION.cff ou o botão "Cite this repository" no GitHub.

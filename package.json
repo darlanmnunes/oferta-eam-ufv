@@ -1,9 +1,11 @@
 {
   "name": "oferta-eam-ufv",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "description": "Oferta de disciplinas | Engenharia de Agrimensura e Cartográfica | UFV",
+  "license": "AGPL-3.0-or-later",
+  "author": "Darlan Miranda Nunes <darlan.nunes@ufv.br> (Universidade Federal de Viçosa)",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",

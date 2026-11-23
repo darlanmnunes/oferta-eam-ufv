@@ -8,3 +8,5 @@ shots
 # dados com nomes de docentes: ficam só na máquina
 db/privado/
 dados-fonte/privado/
+# controle de registro do software (DOI, commit e hashes): só na máquina
+DOI.md

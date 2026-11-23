@@ -71,7 +71,7 @@ Agrimensura e Cartográfica da UFV* (versão 1.0.1) [Software]. Zenodo. https://
 
 O DOI acima vale para todas as versões e leva sempre à mais recente. Para citar só a versão 1.0.1, use
 [10.5281/zenodo.24478309](https://doi.org/10.5281/zenodo.24478309). Os metadados estão em [CITATION.cff](CITATION.cff)
-e no botão "Cite this repository" do GitHub; DOI, commit e hashes de cada versão em [DOI.md](DOI.md). Licença AGPL-3.0-or-later ([LICENSE](LICENSE)); marcas e dados têm regras
+e no botão "Cite this repository" do GitHub. Licença AGPL-3.0-or-later ([LICENSE](LICENSE)); marcas e dados têm regras
 próprias ([NOTICE](NOTICE)).
 
 ---

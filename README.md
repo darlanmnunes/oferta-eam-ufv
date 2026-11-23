@@ -4,6 +4,8 @@
 
 **Acesse:** [darlanmnunes.github.io/oferta-eam-ufv](https://darlanmnunes.github.io/oferta-eam-ufv/)
 
+[![DOI](https://zenodo.org/badge/1462046744.svg)](https://doi.org/10.5281/zenodo.24478308)
+
 Sistema para planejar, a cada semestre, a oferta de disciplinas do curso de Engenharia de Agrimensura e
 Cartográfica da UFV: turmas, horários, salas e carga docente. Substitui a planilha de distribuição de aulas.
 
@@ -61,6 +63,16 @@ React 19, TypeScript e Vite 8; banco e login no Supabase (PostgreSQL); publicaç
 - `npm run publicar` gera o site e envia para o ramo `gh-pages`.
 
 </details>
+
+## Como citar
+
+Nunes, D. M. (2026). *Oferta de Disciplinas EAM: sistema de planejamento da oferta de disciplinas da Engenharia de
+Agrimensura e Cartográfica da UFV* (versão 1.0.1) [Software]. Zenodo. https://doi.org/10.5281/zenodo.24478308
+
+O DOI acima vale para todas as versões e leva sempre à mais recente. Para citar só a versão 1.0.1, use
+[10.5281/zenodo.24478309](https://doi.org/10.5281/zenodo.24478309). Os metadados estão em [CITATION.cff](CITATION.cff)
+e no botão "Cite this repository" do GitHub; DOI, commit e hashes de cada versão em [DOI.md](DOI.md). Licença AGPL-3.0-or-later ([LICENSE](LICENSE)); marcas e dados têm regras
+próprias ([NOTICE](NOTICE)).
 
 ---
 

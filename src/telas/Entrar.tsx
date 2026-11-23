@@ -59,7 +59,7 @@ export function Entrar() {
         )}
       </div>
       <a className="entrada-voltar" href="#/inicio">Voltar à página inicial</a>
-      <p className="entrada-rodape">Departamento de Engenharia Civil | Universidade Federal de Viçosa<br />Desenvolvido por Prof. Dr. Darlan Miranda Nunes</p>
+      <p className="entrada-rodape">Departamento de Engenharia Civil | Universidade Federal de Viçosa<br />Desenvolvido por Prof. Dr. Darlan Miranda Nunes<br /><a className="rodape-doi" href="https://doi.org/10.5281/zenodo.24478308">DOI 10.5281/zenodo.24478308</a></p>
     </main>
   )
 }

@@ -5,6 +5,14 @@ title: "Oferta de Disciplinas EAM: sistema de planejamento da oferta de discipli
 abstract: "Sistema web para planejar a oferta semestral de disciplinas de um curso de graduação: turmas, horários, salas e carga docente, com conferência pela periodicidade das disciplinas e pelo horário oficial do Registro Escolar, detecção de conflitos, grades para impressão e histórico imutável de alterações."
 version: "1.0.1"
 date-released: "2026-11-23"
+doi: "10.5281/zenodo.24478308"
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.24478308"
+    description: "DOI de todas as versões (aponta sempre para a mais recente)"
+  - type: doi
+    value: "10.5281/zenodo.24478309"
+    description: "DOI da versão 1.0.1"
 license: AGPL-3.0-or-later
 repository-code: "https://github.com/darlanmnunes/oferta-eam-ufv"
 url: "https://darlanmnunes.github.io/oferta-eam-ufv/"

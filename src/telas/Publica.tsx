@@ -211,7 +211,7 @@ export function Publica() {
 
       <footer className="rodape nao-imprime">
         <img src="./marca/ufv.png" alt="Universidade Federal de Viçosa" height="40" />
-        <p>Engenharia de Agrimensura e Cartográfica | Departamento de Engenharia Civil | UFV<br /><span className="rodape-autor">Desenvolvido por Prof. Dr. Darlan Miranda Nunes</span></p>
+        <p>Engenharia de Agrimensura e Cartográfica | Departamento de Engenharia Civil | UFV<br /><span className="rodape-autor">Desenvolvido por Prof. Dr. Darlan Miranda Nunes</span><br /><a className="rodape-doi" href="https://doi.org/10.5281/zenodo.24478308">DOI 10.5281/zenodo.24478308</a></p>
         <img src="./marca/assinatura.png" alt="EAM | Engenharia de Agrimensura e Cartográfica" height="40" />
       </footer>
     </div>
